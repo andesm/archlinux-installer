@@ -1,0 +1,28 @@
+---
+
+- name: Reset the valiable of replaces/blockinfiles/templates
+  include_vars: config_default.yml
+
+- include_tasks: roles/lib/tasks/create_configs.yml
+  vars:
+    blockinfiles:
+      - file: /etc/pacman.d/mirrorlist
+        contents:
+          - insertafter: '## Arch Linux'
+            block: |
+              Server = http://ftp.jaist.ac.jp/pub/Linux/ArchLinux/$repo/os/$arch
+              Server = http://ftp.tsukuba.wide.ad.jp/Linux/archlinux/$repo/os/$arch
+        notify:
+          - noop
+            
+- name: Run the equivalent of pacman update_cache
+  pacman:
+    update_cache: yes
+  changed_when: false
+      
+- name: Install the related packages (ArchLinux)
+  pacman:
+    name: '{{ item }}'
+  with_items:
+    - python-pexpect
+        

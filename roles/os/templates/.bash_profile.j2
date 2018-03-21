@@ -1,0 +1,13 @@
+systemctl enable systemd-networkd.service
+systemctl start systemd-networkd.service
+systemctl enable systemd-resolved.service
+systemctl start systemd-resolved.service
+systemctl enable sshd.service
+systemctl start sshd.service
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf        
+groupadd {{ group }}
+useradd -m -g {{ group }} -G wheel -s /bin/bash {{ user }}
+passwd
+passwd {{ user }}
+rm .bash_profile
+        

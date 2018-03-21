@@ -1,0 +1,5 @@
+disk: vda
+swap: 1024
+hostname: fx-system-trade        
+user: andesm
+group: flg

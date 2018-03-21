@@ -1,0 +1,5 @@
+- hosts: os-install
+  roles:
+    - init_os
+    - os
+

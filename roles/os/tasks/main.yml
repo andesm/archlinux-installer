@@ -1,0 +1,70 @@
+---
+
+- include_tasks: roles/lib/tasks/init_role.yml
+
+- name: Check /dev/disk exists
+  shell: 'fdisk -l | grep {{ disk }}3'
+  register: result
+  failed_when: false
+  changed_when: false
+
+- name: Partition the disks
+  expect:
+    command: 'gdisk /dev/{{ disk }}'
+    responses:
+      'Command':
+        - 'n'
+        - 'n'
+        - 'n'
+        - 'w'
+      'Partition number':
+        - ''
+        - ''
+        - ''
+      'First sector':
+        - ''
+        - ''
+        - ''
+      'Last sector':
+        - '+2M'
+        - '+{{ swap }}M'
+        - ''
+      'Hex code or GUID':
+        - 'ef02'
+        - '8200'
+        - '8300'
+      'Do you want to proceed':
+        - 'y'
+  when: result.rc
+      
+- name: Update the system clock
+  shell: timedatectl set-ntp true
+  changed_when: false
+
+- name: Format the partitions
+  filesystem: 
+    fstype: ext4
+    dev: '/dev/{{ disk }}3'
+
+- name: Mount the file system
+  mount:
+    name: /mnt
+    src: '/dev/{{ disk }}3'
+    fstype: ext4
+    state: mounted
+  
+- name: Install Arch Linux
+  shell: '{{ item }}'
+  with_items:
+    - pacstrap /mnt base
+    - mkswap '/dev/{{ disk }}2'
+    - genfstab -U /mnt >> /mnt/etc/fstab
+  changed_when: false
+    
+- include_tasks: roles/lib/tasks/create_configs.yml
+
+- name: Change root into the new system
+  command: arch-chroot /mnt /root/setup.sh
+  changed_when: false
+  
+  

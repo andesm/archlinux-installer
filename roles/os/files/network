@@ -1,0 +1,8 @@
+[Match]
+Name=en*
+
+[Network]
+DHCP=ipv4
+
+#[Link]
+#MTUBytes=1450

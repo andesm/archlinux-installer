@@ -1,0 +1,17 @@
+---
+
+copy:
+  - files:
+      - path: /mnt/root/network
+    notify:
+      - noop
+
+templates:
+  - files:
+      - path: /mnt/root/setup.sh
+        mode: '0744'
+      - path: /mnt/root/.bash_profile
+    notify:
+      - noop
+
+    
